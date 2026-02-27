@@ -1,15 +1,20 @@
+import { useState } from 'react';
 import { useFuelStore } from '@/app/providers/store';
 import { PumpCard } from '@/entities/pump/ui/PumpCard';
+import { Overlay } from '@/common/ui/Overlay/Overlay';
+import { RefuelForm } from '@/features/refuel/RefuelForm';
+import type { Pump } from '@/entities/pump/model/types';
 import styles from './PumpList.module.css';
 
 export const PumpList = () => {
-  // Достаем список колонок из глобального хранилища
   const pumps = useFuelStore((state) => state.pumps);
+    const [selectedPump, setSelectedPump] = useState<Pump | null>(null);
+ 
+    const handleSelectPump = (pump: Pump) => {
+        setSelectedPump(pump);
+    };
 
-  const handleSelectPump = (id: string) => {
-    console.log(`Выбрана колонка: ${id}`);
-    // Сюда мы позже добавим открытие модалки заправки
-  };
+    const handleClose = () => setSelectedPump(null);
 
   return (
     <section className={styles.container}>
@@ -19,10 +24,22 @@ export const PumpList = () => {
           <PumpCard 
             key={pump.id} 
             pump={pump} 
-            onSelect={handleSelectPump}
+            onSelect={() => handleSelectPump(pump)}
           />
         ))}
       </div>
-    </section>
+
+       
+        {selectedPump && (
+        <Overlay onClose={handleClose}>
+            <RefuelForm 
+            pumpId={selectedPump.id}
+            availableFuels={selectedPump.availableFuels}
+            onSuccess={handleClose}
+            />
+            </Overlay>
+        )}
+
+        </section>
   );
 };
