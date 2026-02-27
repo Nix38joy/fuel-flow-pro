@@ -14,6 +14,7 @@ interface FuelFlowState {
   
   createOrder: (pumpId: string, fuelId: FuelId, liters: number) => void;
     cancelOrder: (orderId: string) => void;
+    completeOrder: (orderId: string) => void;
 }
 
 
@@ -56,6 +57,11 @@ createOrder: (pumpId, fuelId, liters) => set((state) => {
         
     };
 
+    setTimeout(() => {
+        const { completeOrder } = useFuelStore.getState();
+        completeOrder(newOrder.id);
+    }, 15000);
+
     return {
         orders: [...state.orders, newOrder],
         pumps: state.pumps.map(p =>
@@ -63,6 +69,30 @@ createOrder: (pumpId, fuelId, liters) => set((state) => {
         )
     };
 }),
+        completeOrder: (orderId) => set((state) => {
+            const order = state.orders.find(o => o.id === orderId);
+            if (!order) return state;
+
+            return {
+                fuels: {
+                    ...state.fuels,
+                    [order.fuelType]: {
+                        ...state.fuels[order.fuelType],
+                        remains: state.fuels[order.fuelType].remains - order.requestedLiters
+                    }
+                },
+                pumps: state.pumps.map(p =>
+                    p.currentOrderId === orderId ? { ...p, status: 'available' as const, currentOrderId: undefined } : p
+                ),
+
+                orders: state.orders.map(o => 
+                    o.id === orderId ? {...o, status: 'completed' as const, filledLiters: o.requestedLiters } : o
+                )
+            };
+        }),
+
+
+
 
     cancelOrder: (id) => set((state) => ({
     orders: state.orders.filter(o => o.id !== id),
