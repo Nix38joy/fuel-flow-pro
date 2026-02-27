@@ -1,5 +1,5 @@
 import type { BaseEntity, Id, Liters, Currency } from '@/shared/types';
-import type { FuelType } from '@/entities/fuel/model/types';
+import type { FuelId } from '@/entities/fuel/model/types';
 
 /** 
  * Жизненный цикл заказа на современной АЗС
@@ -11,7 +11,7 @@ export interface Order extends BaseEntity {
   pumpId: Id;
   
   /** Какое топливо выбрано */
-  fuelType: FuelType;
+  fuelType: FuelId;
   
   /** Сколько литров заказал клиент */
   requestedLiters: Liters;

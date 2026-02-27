@@ -1,5 +1,5 @@
 import type { BaseEntity } from '@/shared/types';
-import type { FuelType } from '@/entities/fuel/model/types';
+import type { FuelId } from '@/entities/fuel/model/types';
 
 /**
  * Состояния колонки в реальной системе управления
@@ -14,7 +14,7 @@ export interface Pump extends BaseEntity {
   status: PumpStatus;
   
   /** Список марок топлива, доступных именно на этом "пистолете" */
-  availableFuels: FuelType[];
+  availableFuels: FuelId[];
   
   /** ID текущего заказа, если колонка в статусе 'filling' */
   currentOrderId?: string;
