@@ -1,0 +1,18 @@
+.container {
+  margin-top: 40px;
+}
+
+.title {
+  color: #fff;
+  font-weight: 300;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.grid {
+  display: grid;
+  /* Адаптивная сетка: колонки минимум 280px, максимум — сколько влезет */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}

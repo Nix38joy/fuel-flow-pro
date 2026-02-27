@@ -1,0 +1,51 @@
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.available { color: #27ae60; font-weight: bold; }
+.busy { color: #f1c40f; }
+.maintenance { color: #e67e22; }
+
+.fuels {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.fuelBadge {
+  background: #333;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.button {
+  margin-top: 10px;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #27ae60;
+  color: #27ae60;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.button:hover:not(:disabled) {
+  background: #27ae60;
+  color: white;
+}
+
+.button:disabled {
+  border-color: #555;
+  color: #555;
+  cursor: not-allowed;
+}

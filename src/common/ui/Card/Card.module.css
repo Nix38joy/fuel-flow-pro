@@ -1,0 +1,27 @@
+.card {
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.default { border-top: 4px solid #555; }
+.active { border-top: 4px solid #27ae60; }
+.danger { border-top: 4px solid #e74c3c; }
+
+.title {
+  margin: 0 0 15px 0;
+  color: #fff;
+  font-size: 1.2rem;
+  letter-spacing: 0.5px;
+}
+
+.content {
+  color: #aaa;
+}
