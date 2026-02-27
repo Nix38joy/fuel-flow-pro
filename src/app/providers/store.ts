@@ -12,13 +12,15 @@ interface FuelFlowState {
   pumps: Pump[];
   orders: Order[];
   
-  // Функции для изменения данных (Actions) — их пропишем чуть позже
+  createOrder: (pumpId: string, fuelId: FuelId, liters: number) => void;
+    cancelOrder: (orderId: string) => void;
 }
+
 
 /**
  * Создаем хук useFuelStore, который даст доступ к данным любому компоненту
  */
-export const useFuelStore = create<FuelFlowState>(() => ({
+export const useFuelStore = create<FuelFlowState>((set) => ({
   // 1. Склад топлива
   fuels: {
     'ai-92': { id: 'ai-92', name: 'АИ-92 Эко', price: 48.5, remains: 2500, capacity: 5000 },
@@ -37,4 +39,40 @@ export const useFuelStore = create<FuelFlowState>(() => ({
   
   // 3. Очередь активных транзакций (пока пуста)
   orders: [],
-}));
+createOrder: (pumpId, fuelId, liters) => set((state) => {
+    const fuel = state.fuels[fuelId as FuelId];
+    const totalPrice = fuel.price * liters;
+
+    const newOrder: Order = {
+        id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(), 
+        pumpId,
+        fuelType: fuelId,
+        requestedLiters: liters,
+        filledLiters: 0,
+        pricePerLiter: fuel.price,
+        totalPrice,
+        status: 'pending',
+        createdAt: Date.now(),
+        
+    };
+
+    return {
+        orders: [...state.orders, newOrder],
+        pumps: state.pumps.map(p =>
+            p.id === pumpId ? { ...p, status: 'filling' as const, currentOrderId: newOrder.id} : p
+        )
+    };
+}),
+
+    cancelOrder: (id) => set((state) => ({
+    orders: state.orders.filter(o => o.id !== id),
+    pumps: state.pumps.map(p => 
+    p.currentOrderId === id ? { ...p, status: 'available' as const, currentOrderId: undefined } : p
+      )
+    })),
+  }));
+
+
+
+
+
