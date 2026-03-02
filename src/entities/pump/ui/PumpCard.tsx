@@ -71,15 +71,21 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
           </span>
         </div>
         
-        {pump.status === 'filling' && (
+        {pump.status === 'filling' && currentOrder && (
           <div className={styles.progressSection}>
             <div className={styles.progressHeader}>
                <Gauge size={14} />
-               <span>Наполнено: {Math.round(progress)}%</span>
+               <span>
+                
+                {((currentOrder.requestedLiters * progress) /100).toFixed(2)} / {currentOrder?.requestedLiters} л
+               </span>
             </div>
             <ProgressBar progress={progress} />
-          </div>
-        )}
+          <div className={styles.moneyCounter}>
+            {((currentOrder.totalPrice * progress) / 100).toFixed(2)} Р
+            </div>
+            </div>
+          )}
 
         <div className={styles.fuels}>
           {pump.availableFuels.map(fuelId => (

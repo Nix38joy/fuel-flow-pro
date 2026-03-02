@@ -89,3 +89,12 @@
   100% { opacity: 1; }
 }
 
+.moneyCounter {
+  text-align: right;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #27ae60;
+  margin-top: 5px;
+  font-variant-numeric: tabular-nums; /* Чтобы цифры не "прыгали" при смене */
+}
+
