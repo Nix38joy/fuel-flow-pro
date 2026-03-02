@@ -21,7 +21,7 @@ interface FuelFlowState {
  */
 export const useFuelStore = create<FuelFlowState>()(
     persist(
-        (set, get) => ({
+        (set) => ({
 
   
   fuels: {
