@@ -3,6 +3,8 @@ import { useFuelStore } from '@/app/providers/store';
 import { Card } from '@/common/ui/Card/Card';
 import { ProgressBar } from '@/common/ui/ProgressBar/ProgressBar';
 import { Fuel, Gauge, Zap, CheckCircle2 } from 'lucide-react';
+// Добавляем импорт типа FuelId для типизации
+import type { FuelId } from '@/entities/fuel/model/types'; 
 import styles from './PumpCard.module.css';
 import type { Pump } from '../model/types';
 
@@ -13,6 +15,13 @@ interface PumpCardProps {
 
 export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
   const orders = useFuelStore((state) => state.orders);
+  const fuels = useFuelStore((state) => state.fuels);
+
+  // ИСПРАВЛЕНО: Добавлен const и проверка наличия топлива
+  const hasEnoughFuel = pump.availableFuels.some(
+    (fuelId) => fuels[fuelId as FuelId].remains > 50
+  );
+
   const currentOrder = orders.find(o => o.id === pump.currentOrderId);
   const [progress, setProgress] = useState(0);
 
@@ -38,7 +47,8 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
     return () => clearInterval(interval);
   }, [pump.status, currentOrder]);
 
-  const cardVariant = pump.status === 'available' ? 'active' : 'danger';
+  // Вариант карточки теперь зависит и от статуса, и от наличия топлива
+  const cardVariant = pump.status === 'available' && hasEnoughFuel ? 'active' : 'danger';
 
   return (
     <Card variant={cardVariant}>
@@ -55,7 +65,9 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
             <CheckCircle2 size={14} />
           )}
           <span className={styles[pump.status]}>
-            {pump.status === 'available' ? 'Готова к работе' : 'Идет заправка'}
+            {pump.status === 'available' 
+              ? (hasEnoughFuel ? 'Готова к работе' : 'Нет топлива') 
+              : 'Идет заправка'}
           </span>
         </div>
         
@@ -80,13 +92,12 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
         <button 
           className={styles.button}
           onClick={() => onSelect?.(pump)}
-          disabled={pump.status !== 'available'}
+          // Блокируем кнопку, если идет заправка ИЛИ нет топлива
+          disabled={pump.status !== 'available' || !hasEnoughFuel}
         >
-          {pump.status === 'filling' ? 'Занято' : 'Выбрать'}
+          {pump.status === 'filling' ? 'Занято' : !hasEnoughFuel ? 'Пусто' : 'Выбрать'}
         </button>
       </div>
     </Card>
   );
 };
-
-
