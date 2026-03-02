@@ -1,11 +1,9 @@
 import { create } from 'zustand';
+import {persist } from 'zustand/middleware';
 import type { Fuel, FuelId } from '@/entities/fuel/model/types';
 import type { Pump } from '@/entities/pump/model/types';
 import type { Order } from '@/entities/order/model/types';
 
-/**
- * Описываем структуру нашего глобального хранилища (Store)
- */
 interface FuelFlowState {
   // Данные (State)
   fuels: Record<FuelId, Fuel>;
@@ -21,8 +19,11 @@ interface FuelFlowState {
 /**
  * Создаем хук useFuelStore, который даст доступ к данным любому компоненту
  */
-export const useFuelStore = create<FuelFlowState>((set) => ({
-  // 1. Склад топлива
+export const useFuelStore = create<FuelFlowState>()(
+    persist(
+        (set, get) => ({
+
+  
   fuels: {
     'ai-92': { id: 'ai-92', name: 'АИ-92 Эко', price: 48.5, remains: 2500, capacity: 5000 },
     'ai-95': { id: 'ai-95', name: 'АИ-95 Премиум', price: 53.2, remains: 1800, capacity: 5000 },
@@ -100,7 +101,12 @@ createOrder: (pumpId, fuelId, liters) => set((state) => {
     p.currentOrderId === id ? { ...p, status: 'available' as const, currentOrderId: undefined } : p
       )
     })),
-  }));
+  }),
+  {
+    name: 'fuel-flow-storage',
+  }
+)
+);
 
 
 
