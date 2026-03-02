@@ -1,8 +1,10 @@
 import { useFuelStore } from '@/app/providers/store';
+import { motion, AnimatePresence } from 'framer-motion';
 import styles from './OrderHistory.module.css';
 
+
 export const OrderHistory = () => {
-  // Получаем заказы из нашего глобального хранилища
+  
   const orders = useFuelStore((state) => state.orders);
 
   // 1. Фильтруем только успешно завершенные заказы
@@ -35,11 +37,24 @@ export const OrderHistory = () => {
       <h2 className={styles.title}>История операций</h2>
 
       <div className={styles.list}>
+        <AnimatePresence initial={false}>
         {completedOrders.length === 0 ? (
           <p className={styles.empty}>Чеков пока нет...</p>
         ) : (
           completedOrders.map((order) => (
-            <div key={order.id} className={styles.card}>
+                <motion.div 
+             key={order.id} 
+              layout // Магия: плавно двигает соседей
+               initial={{ opacity: 0, x: 50, scale: 0.9 }} // Появление
+               animate={{ opacity: 1, x: 0, scale: 1 }}    // Финал
+               exit={{ opacity: 0, scale: 0.5 }}           // Уход (на будущее)
+               transition={{ 
+                 type: 'spring', 
+                 stiffness: 400, 
+                damping: 30 
+               }}
+              className={styles.card}
+                >
               <div className={styles.header}>
                 <span className={styles.pump}>Колонка №{order.pumpId.replace('p', '')}</span>
                 <span className={styles.time}>
@@ -61,9 +76,10 @@ export const OrderHistory = () => {
                   {order.totalPrice.toFixed(2)} ₽
                 </span>
               </div>
-            </div>
+            </motion.div>
           ))
         )}
+        </AnimatePresence>
       </div>
     </aside>
   );
