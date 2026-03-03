@@ -1,73 +1,26 @@
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+FuelFlow Pro | Enterprise Fuel Management System
+FuelFlow Pro — это высокотехнологичная ERP-система для управления автозаправочными станциями. Проект демонстрирует внедрение сложной бизнес-логики, работу с асинхронными процессами в реальном времени и масштабируемую архитектуру.
+Key Features
+Real-time Monitoring: 15-секундные циклы заправки с живыми счетчиками литров и стоимости.
+Inventory Management: Автоматическое списание топлива из резервуаров и система Hard Limit (блокировка при остатке < 50л).
+Smart Validation: Валидация заказов на основе текущих складских остатков.
+Transaction Logging: Реактивная история операций с пружинными анимациями (Framer Motion).
+Data Persistence: Сохранение состояния сессии в LocalStorage (Zustand Persist).
+Tech Stack & Architecture
+Framework: React 18 + Vite
+Language: TypeScript (Strict Mode)
+State Management: Zustand (Middlewares: Persist)
+Architecture: Feature-Sliced Design (FSD) — четкое разделение на слои (Shared, Entities, Features, Widgets, App).
+UI & Animation: CSS Modules, Lucide Icons, Framer Motion.
+Project Structure (FSD)
+src/app — Инициализация приложения и глобальный Store.
+src/widgets — Крупные блоки (Список колонок, Монитор склада, История).
+src/features — Пользовательские сценарии (Форма заправки + валидация).
+src/entities — Бизнес-сущности (Топливо, Колонки, Заказы).
+src/common (Shared) — Переиспользуемые UI-компоненты и базовые типы.
+Installation & Setup
+Clone the repository: git clone ...
+Install dependencies: npm install
+Run dev server: npm run dev
+Build for production: npm run build
+Developed by Nix38joy — Frontend Engineer with deep Domain Expertise in Fuel Retail.
