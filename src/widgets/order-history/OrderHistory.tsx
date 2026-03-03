@@ -1,10 +1,11 @@
 import { useFuelStore } from '@/app/providers/store';
 import { motion, AnimatePresence } from 'framer-motion';
-import { History, Banknote, Box, Receipt } from 'lucide-react';
+import { History, Banknote, Box, Receipt, RefreshCcw } from 'lucide-react';
 import styles from './OrderHistory.module.css';
 
 export const OrderHistory = () => {
   const orders = useFuelStore((state) => state.orders);
+  const resetStore = useFuelStore((state) => state.resetStore);
   const completedOrders = orders
     .filter((order) => order.status === 'completed')
     .sort((a, b) => b.createdAt - a.createdAt);
@@ -21,6 +22,14 @@ export const OrderHistory = () => {
           <div className={styles.statHeader}><Box size={14} /><span className={styles.statLabel}>Операций</span></div>
           <span className={styles.statValue}>{completedOrders.length}</span>
         </div>
+        <button 
+        onClick={resetStore}
+        className={styles.resetButton}
+        title="Закрыть смену"
+        >
+          <RefreshCcw size={14} />
+          <span>Закрыть смену</span>
+          </button>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #333', paddingBottom: '12px' }}>
         <History size={18} color="#27ae60" />

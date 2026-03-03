@@ -11,6 +11,7 @@ interface FuelFlowState {
   createOrder: (pumpId: string, fuelId: FuelId, liters: number) => void;
   cancelOrder: (orderId: string) => void;
   completeOrder: (orderId: string) => void;
+  resetStore: () => void;
 }
 
 export const useFuelStore = create<FuelFlowState>()(
@@ -88,6 +89,13 @@ export const useFuelStore = create<FuelFlowState>()(
           p.currentOrderId === id ? { ...p, status: 'available' as const, currentOrderId: undefined } : p
         )
       })),
+
+      resetStore: () => {
+        if (window.confirm( 'Вы уверены, что хотите закрыть смену? Все данные будут удалены.')) {
+          localStorage.removeItem('fuel-flow-storage');
+          window.location.reload();
+        }
+      }
     }),
     { name: 'fuel-flow-storage' }
   )

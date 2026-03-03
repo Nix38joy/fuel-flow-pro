@@ -135,3 +135,24 @@
   color: #666;
   margin-bottom: 4px;
 }
+.resetButton {
+  grid-column: 1 / -1; /* Растягиваем на две колонки статистики */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 8px;
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.2);
+  border-radius: 6px;
+  color: #e74c3c;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.resetButton:hover {
+  background: #e74c3c;
+  color: #fff;
+}
