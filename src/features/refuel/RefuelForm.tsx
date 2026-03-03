@@ -1,66 +1,84 @@
 import { useState } from 'react';
-import { useFuelStore } from '@/app/providers/store';
+import { useFuelStore } from '@/app/providers/store'; // Достаем наш склад
 import type { FuelId } from '@/entities/fuel/model/types';
 import styles from './RefuelForm.module.css';
 
+// Добавь эти интерфейсы после импортов
 interface RefuelFormProps {
   pumpId: string;
-  availableFuels: FuelId[];
-  onSuccess: () => void;
+  availableFuels: FuelId[]; // Используем наш тип FuelId
+  onSuccess?: () => void;
 }
+
+
+// ... пропсы без изменений ...
 
 export const RefuelForm = ({ pumpId, availableFuels, onSuccess }: RefuelFormProps) => {
   const [selectedFuel, setSelectedFuel] = useState<FuelId>(availableFuels[0]);
-  const [liters, setLiters] = useState<number>(20);
-  const fuels = useFuelStore((state) => state.fuels);
-  const currentRemains = fuels[selectedFuel].remains;
-  const isInvalid = liters > currentRemains || liters < 1 || currentRemains < 50;
+  const [liters, setLiters] = useState<number>(0);
 
-  
-  // Достаем экшен из стора
+  // 1. Достаем данные о топливе из стора
+  const fuels = useFuelStore((state) => state.fuels);
   const createOrder = useFuelStore((state) => state.createOrder);
+
+  // 2. ВЫЧИСЛЯЕМ ВАЛИДНОСТЬ (Логика Middle-разработчика)
+  const currentFuelRemains = fuels[selectedFuel].remains;
+  const isTooMuch = liters > currentFuelRemains;
+  const isInvalidAmount = liters <= 0;
+  const isDisabled = isTooMuch || isInvalidAmount;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isInvalid) {
+    if (!isDisabled) {
       createOrder(pumpId, selectedFuel, liters);
-      onSuccess();
+      onSuccess?.();
     }
   };
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h2 className={styles.title}>Заправка: Колонка {pumpId}</h2>
+      <h2 className={styles.title}>Новая заправка</h2>
       
+      {/* Выбор топлива */}
       <div className={styles.field}>
-        <label>Тип топлива:</label>
+        <label>Тип топлива</label>
         <select 
           value={selectedFuel} 
           onChange={(e) => setSelectedFuel(e.target.value as FuelId)}
         >
           {availableFuels.map(id => (
-            <option key={id} value={id}>{id.toUpperCase()}</option>
+            <option key={id} value={id}>
+              {fuels[id as FuelId].name} ({fuels[id as FuelId].remains} л доступно)
+            </option>
           ))}
         </select>
       </div>
 
+      {/* Поле ввода литров */}
       <div className={styles.field}>
-        <label>Литры:</label>
+        <label>Количество литров</label>
         <input 
           type="number" 
-          value={liters} 
+          value={liters || ''} 
           onChange={(e) => setLiters(Number(e.target.value))}
-          className={isInvalid ? styles.inputError : ''}
-          min="1"
+          placeholder="0.00"
+          className={isTooMuch ? styles.inputError : ''}
         />
-        {isInvalid && <p className={styles.errorText}>Превышен остаток! (Доступно: {currentRemains}л)</p>}
+        
+        {/* СООБЩЕНИЯ ОБ ОШИБКАХ */}
+        {isTooMuch && (
+          <p className={styles.errorText}>
+            Ошибка: На складе всего {currentFuelRemains} л
+          </p>
+        )}
       </div>
 
       <button 
-        type="submit" className={styles.submitBtn}
-        disabled={isInvalid}
-        >
-        Начать заправку
+        type="submit" 
+        className={styles.submitButton}
+        disabled={isDisabled}
+      >
+        {isTooMuch ? 'Недостаточно топлива' : 'Начать заправку'}
       </button>
     </form>
   );
