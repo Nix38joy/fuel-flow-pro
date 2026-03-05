@@ -1,26 +1,21 @@
-FuelFlow Pro | Enterprise Fuel Management System
-FuelFlow Pro — это высокотехнологичная ERP-система для управления автозаправочными станциями. Проект демонстрирует внедрение сложной бизнес-логики, работу с асинхронными процессами в реальном времени и масштабируемую архитектуру.
-Key Features
-Real-time Monitoring: 15-секундные циклы заправки с живыми счетчиками литров и стоимости.
-Inventory Management: Автоматическое списание топлива из резервуаров и система Hard Limit (блокировка при остатке < 50л).
-Smart Validation: Валидация заказов на основе текущих складских остатков.
-Transaction Logging: Реактивная история операций с пружинными анимациями (Framer Motion).
-Data Persistence: Сохранение состояния сессии в LocalStorage (Zustand Persist).
-Tech Stack & Architecture
-Framework: React 18 + Vite
-Language: TypeScript (Strict Mode)
-State Management: Zustand (Middlewares: Persist)
-Architecture: Feature-Sliced Design (FSD) — четкое разделение на слои (Shared, Entities, Features, Widgets, App).
-UI & Animation: CSS Modules, Lucide Icons, Framer Motion.
-Project Structure (FSD)
-src/app — Инициализация приложения и глобальный Store.
-src/widgets — Крупные блоки (Список колонок, Монитор склада, История).
-src/features — Пользовательские сценарии (Форма заправки + валидация).
-src/entities — Бизнес-сущности (Топливо, Колонки, Заказы).
-src/common (Shared) — Переиспользуемые UI-компоненты и базовые типы.
-Installation & Setup
-Clone the repository: git clone ...
-Install dependencies: npm install
-Run dev server: npm run dev
-Build for production: npm run build
-Developed by Nix38joy — Frontend Engineer with deep Domain Expertise in Fuel Retail.
+⛽ FuelFlow Pro | Enterprise Resource Management System
+FuelFlow Pro — профессиональная ERP-система для управления заправочными станциями в режиме реального времени. Проект ориентирован на решение сложных задач синхронизации асинхронных состояний, управление ресурсами и обеспечение целостности данных.
+🛠 Ключевые инженерные решения
+State Machine Control: Реализована управляемая машина состояний процесса заправки (Filling / Paused / Completed). Поддержка возобновления операций (Resume) с сохранением прогресса и пересчетом временных меток без потери точности. [INDEX: 1, 3]
+Data Integrity Guard: Внедрена логика блокировки критических действий (закрытие смены) при наличии активных транзакций для предотвращения утечек данных и расхождения отчетов. [INDEX: 4]
+Real-time Engine: Динамический расчет пролива топлива (1л/сек) с мгновенным обновлением складских остатков и финансовых показателей в глобальном сторе. [INDEX: 1]
+Industrial UX/UI: Кастомная система модальных окон для отчетов, обработка пустых состояний (Empty States) и адаптивная панель управления заправкой. [INDEX: 5]
+🏗 Архитектура (FSD Implementation)
+Проект строго следует методологии Feature-Sliced Design, обеспечивая изоляцию логики и масштабируемость:
+Entities: Бизнес-сущности (Заказ, Колонка, Топливо) с жесткой типизацией. [INDEX: 2]
+Features: Изолированные сценарии заправки и управления состоянием сессии.
+Widgets: Композиционные узлы (Мониторинг склада, Интерактивная история операций).
+Shared/Common: Универсальный UI-кит (Modal, ProgressBar, EmptyState).
+💻 Технологический стек
+Core: React 18, TypeScript (Strict Mode, verbatimModuleSyntax).
+State: Zustand + Persist Middleware (Session recovery).
+Animation: Framer Motion (Layout transitions, AnimatePresence).
+Tooling: Vite, Lucide React.
+📦 Быстрый старт
+git clone https://github.com
+npm install && npm run dev
