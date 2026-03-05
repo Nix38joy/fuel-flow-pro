@@ -18,7 +18,7 @@ interface FuelFlowState {
 
 export const useFuelStore = create<FuelFlowState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       fuels: {
         'ai-92': { id: 'ai-92', name: 'АИ-92', price: 48.5, remains: 2500, capacity: 5000 },
         'ai-95': { id: 'ai-95', name: 'АИ-95', price: 55.2, remains: 1800, capacity: 5000 },
