@@ -156,3 +156,33 @@
   background: #e74c3c;
   color: #fff;
 }
+
+.cancelBtn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.confirmBtn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  background: #27ae60;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 12px;
+}

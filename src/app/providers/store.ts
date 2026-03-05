@@ -91,11 +91,10 @@ export const useFuelStore = create<FuelFlowState>()(
       })),
 
       resetStore: () => {
-        if (window.confirm( 'Вы уверены, что хотите закрыть смену? Все данные будут удалены.')) {
+      
           localStorage.removeItem('fuel-flow-storage');
           window.location.reload();
         }
-      }
     }),
     { name: 'fuel-flow-storage' }
   )
