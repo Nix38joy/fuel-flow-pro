@@ -28,3 +28,13 @@
   max-width: 200px;
   line-height: 1.4;
 }
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Центрирует иконку и заголовки */
+  justify-content: center;
+  text-align: center; /* Центрирует сам текст внутри строк */
+  padding: 40px;
+  width: 100%;
+}

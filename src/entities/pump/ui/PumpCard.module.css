@@ -164,19 +164,19 @@
 }
 
 .finishButton {
-  flex: 1.5; /* Немного увеличим место для длинного слова */
-  padding: 10px 5px; /* Уменьшим боковые отступы внутри */
+  flex: 1.5; 
+  padding: 10px 5px; 
   background: #2980b9;
   border: none;
   border-radius: 6px;
   color: white;
-  font-size: 0.75rem; /* Чуть уменьшим шрифт для профессионального вида */
+  font-size: 0.75rem; 
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  text-transform: uppercase; /* Добавим строгости */
+  text-transform: uppercase; 
   cursor: pointer;
   transition: background 0.2s;
 }
