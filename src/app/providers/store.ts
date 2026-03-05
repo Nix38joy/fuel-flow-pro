@@ -9,9 +9,10 @@ interface FuelFlowState {
   pumps: Pump[];
   orders: Order[];
   createOrder: (pumpId: string, fuelId: FuelId, liters: number) => void;
-  cancelOrder: (orderId: string) => void;
+  pauseOrder: (pumpId: string) => void;
+  resumeOrder: (pumpId: string) => void;
   completeOrder: (orderId: string) => void;
-  stopOrder: (pumpId: string) => void; // Метод остановки
+  cancelOrder: (orderId: string) => void;
   resetStore: () => void;
 }
 
@@ -34,9 +35,8 @@ export const useFuelStore = create<FuelFlowState>()(
 
       createOrder: (pumpId, fuelId, liters) => set((state) => {
         const fuel = state.fuels[fuelId as FuelId];
-        const totalPrice = fuel.price * liters;
         const REFUEL_SPEED = 1000; 
-        const calculatedDuration = liters * REFUEL_SPEED;
+        const duration = liters * REFUEL_SPEED;
 
         const newOrder: Order = {
           id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(),
@@ -45,16 +45,11 @@ export const useFuelStore = create<FuelFlowState>()(
           requestedLiters: liters,
           filledLiters: 0,
           pricePerLiter: fuel.price,
-          totalPrice,
+          totalPrice: fuel.price * liters,
           status: 'filling' as const,
           createdAt: Date.now(),
-          duration: calculatedDuration,
+          duration: duration,
         };
-
-        setTimeout(() => {
-          const { completeOrder } = get();
-          completeOrder(newOrder.id);
-        }, calculatedDuration);
 
         return {
           orders: [...state.orders, newOrder],
@@ -64,55 +59,63 @@ export const useFuelStore = create<FuelFlowState>()(
         };
       }),
 
+      pauseOrder: (pumpId) => set((state) => {
+        const pump = state.pumps.find(p => p.id === pumpId);
+        const order = state.orders.find(o => o.id === pump?.currentOrderId);
+        
+        if (!order || order.status !== 'filling') return state;
+
+        const elapsedSinceStart = Date.now() - order.createdAt;
+        const currentFilledLiters = Number((order.requestedLiters * (elapsedSinceStart / order.duration)).toFixed(2));
+
+        return {
+          orders: state.orders.map(o => 
+            o.id === order.id 
+              ? { ...o, status: 'paused' as const, filledLiters: currentFilledLiters } 
+              : o
+          )
+        };
+      }),
+
+      resumeOrder: (pumpId) => set((state) => {
+        const pump = state.pumps.find(p => p.id === pumpId);
+        const order = state.orders.find(o => o.id === pump?.currentOrderId);
+        
+        if (!order || order.status !== 'paused') return state;
+
+        // Рассчитываем новый createdAt так, чтобы прогресс продолжился с того же места
+        const alreadyFilledPercent = order.filledLiters / order.requestedLiters;
+        const timeAlreadySpent = order.duration * alreadyFilledPercent;
+        const newCreatedAt = Date.now() - timeAlreadySpent;
+
+        return {
+          orders: state.orders.map(o => 
+            o.id === order.id ? { ...o, status: 'filling' as const, createdAt: newCreatedAt } : o
+          )
+        };
+      }),
+
       completeOrder: (orderId) => set((state) => {
         const order = state.orders.find(o => o.id === orderId);
-        // Если заказ уже завершен (например, кнопкой СТОП), ничего не делаем
-        if (!order || order.status !== 'filling') return state;
+        if (!order || (order.status !== 'filling' && order.status !== 'paused')) return state;
+
+        // Если нажали "Итог" на паузе, берем filledLiters, если дождались конца — requestedLiters
+        const finalLiters = order.status === 'paused' ? order.filledLiters : order.requestedLiters;
+        const finalPrice = Number((finalLiters * order.pricePerLiter).toFixed(2));
 
         return {
           fuels: {
             ...state.fuels,
             [order.fuelType as FuelId]: {
               ...state.fuels[order.fuelType as FuelId],
-              remains: state.fuels[order.fuelType as FuelId].remains - order.requestedLiters
+              remains: state.fuels[order.fuelType as FuelId].remains - finalLiters
             }
           },
           pumps: state.pumps.map(p => 
             p.currentOrderId === orderId ? { ...p, status: 'available' as const, currentOrderId: undefined } : p
           ),
           orders: state.orders.map(o => 
-            o.id === orderId ? { ...o, status: 'completed' as const, filledLiters: o.requestedLiters } : o
-          )
-        };
-      }),
-
-      stopOrder: (pumpId) => set((state) => {
-        const pump = state.pumps.find(p => p.id === pumpId);
-        const order = state.orders.find(o => o.id === pump?.currentOrderId);
-        
-        if (!pump || !order || order.status !== 'filling') return state;
-
-        // Расчет фактически налитого объема
-        const elapsed = Date.now() - order.createdAt;
-        const progressPercent = Math.min(elapsed / order.duration, 1);
-        const actualLiters = Number((order.requestedLiters * progressPercent).toFixed(2));
-        const actualPrice = Number((actualLiters * order.pricePerLiter).toFixed(2));
-
-        return {
-          fuels: {
-            ...state.fuels,
-            [order.fuelType as FuelId]: {
-              ...state.fuels[order.fuelType as FuelId],
-              remains: state.fuels[order.fuelType as FuelId].remains - actualLiters
-            }
-          },
-          pumps: state.pumps.map(p => 
-            p.id === pumpId ? { ...p, status: 'available' as const, currentOrderId: undefined } : p
-          ),
-          orders: state.orders.map(o => 
-            o.id === order.id 
-              ? { ...o, status: 'completed' as const, filledLiters: actualLiters, totalPrice: actualPrice } 
-              : o
+            o.id === orderId ? { ...o, status: 'completed' as const, filledLiters: finalLiters, totalPrice: finalPrice } : o
           )
         };
       }),

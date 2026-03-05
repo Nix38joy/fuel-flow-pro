@@ -123,3 +123,65 @@
 .stopButton:active {
   transform: translateY(0);
 }
+
+.actions {
+  margin-top: 12px;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.pauseButton {
+  width: 100%;
+  padding: 10px;
+  background: #f39c12; /* Оранжевый */
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.resumeButton {
+  flex: 2;
+  padding: 10px;
+  background: #27ae60;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.finishButton {
+  flex: 1.5; /* Немного увеличим место для длинного слова */
+  padding: 10px 5px; /* Уменьшим боковые отступы внутри */
+  background: #2980b9;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 0.75rem; /* Чуть уменьшим шрифт для профессионального вида */
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-transform: uppercase; /* Добавим строгости */
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.finishButton:hover {
+  background: #3498db;
+}
+

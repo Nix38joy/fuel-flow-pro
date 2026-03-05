@@ -8,7 +8,7 @@ export interface Order {
   filledLiters: number;
   pricePerLiter: number;
   totalPrice: number;
-  status: 'filling' | 'completed' | 'cancelled';
+  status: 'filling' | 'paused' | 'completed' | 'cancelled';
   createdAt: number;
   duration: number; 
 }
