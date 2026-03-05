@@ -11,6 +11,7 @@ interface FuelFlowState {
   createOrder: (pumpId: string, fuelId: FuelId, liters: number) => void;
   cancelOrder: (orderId: string) => void;
   completeOrder: (orderId: string) => void;
+  stopOrder: (pumpId: string) => void; // Метод остановки
   resetStore: () => void;
 }
 
@@ -65,7 +66,9 @@ export const useFuelStore = create<FuelFlowState>()(
 
       completeOrder: (orderId) => set((state) => {
         const order = state.orders.find(o => o.id === orderId);
-        if (!order) return state;
+        // Если заказ уже завершен (например, кнопкой СТОП), ничего не делаем
+        if (!order || order.status !== 'filling') return state;
+
         return {
           fuels: {
             ...state.fuels,
@@ -83,6 +86,37 @@ export const useFuelStore = create<FuelFlowState>()(
         };
       }),
 
+      stopOrder: (pumpId) => set((state) => {
+        const pump = state.pumps.find(p => p.id === pumpId);
+        const order = state.orders.find(o => o.id === pump?.currentOrderId);
+        
+        if (!pump || !order || order.status !== 'filling') return state;
+
+        // Расчет фактически налитого объема
+        const elapsed = Date.now() - order.createdAt;
+        const progressPercent = Math.min(elapsed / order.duration, 1);
+        const actualLiters = Number((order.requestedLiters * progressPercent).toFixed(2));
+        const actualPrice = Number((actualLiters * order.pricePerLiter).toFixed(2));
+
+        return {
+          fuels: {
+            ...state.fuels,
+            [order.fuelType as FuelId]: {
+              ...state.fuels[order.fuelType as FuelId],
+              remains: state.fuels[order.fuelType as FuelId].remains - actualLiters
+            }
+          },
+          pumps: state.pumps.map(p => 
+            p.id === pumpId ? { ...p, status: 'available' as const, currentOrderId: undefined } : p
+          ),
+          orders: state.orders.map(o => 
+            o.id === order.id 
+              ? { ...o, status: 'completed' as const, filledLiters: actualLiters, totalPrice: actualPrice } 
+              : o
+          )
+        };
+      }),
+
       cancelOrder: (id) => set((state) => ({
         orders: state.orders.filter(o => o.id !== id),
         pumps: state.pumps.map(p => 
@@ -91,14 +125,14 @@ export const useFuelStore = create<FuelFlowState>()(
       })),
 
       resetStore: () => {
-      
-          localStorage.removeItem('fuel-flow-storage');
-          window.location.reload();
-        }
+        localStorage.removeItem('fuel-flow-storage');
+        window.location.reload();
+      },
     }),
     { name: 'fuel-flow-storage' }
   )
 );
+
 
 
 

@@ -98,3 +98,28 @@
   font-variant-numeric: tabular-nums; /* Чтобы цифры не "прыгали" при смене */
 }
 
+.stopButton {
+  width: 100%;
+  padding: 10px;
+  margin-top: 12px;
+  background: #e74c3c;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.stopButton:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+}
+
+.stopButton:active {
+  transform: translateY(0);
+}

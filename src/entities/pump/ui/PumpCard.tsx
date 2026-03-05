@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useFuelStore } from '@/app/providers/store';
 import { Card } from '@/common/ui/Card/Card';
 import { ProgressBar } from '@/common/ui/ProgressBar/ProgressBar';
-import { Fuel, Gauge, Zap, CheckCircle2 } from 'lucide-react';
+import { Fuel, Gauge, Zap, CheckCircle2, Square } from 'lucide-react'; // Добавили Square
 import type { FuelId } from '@/entities/fuel/model/types';
 import styles from './PumpCard.module.css';
 import type { Pump } from '../model/types';
@@ -15,6 +15,7 @@ interface PumpCardProps {
 export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
   const orders = useFuelStore((state) => state.orders);
   const fuels = useFuelStore((state) => state.fuels);
+  const stopOrder = useFuelStore((state) => state.stopOrder); // Наш новый метод
   const currentOrder = orders.find(o => o.id === pump.currentOrderId);
   const [progress, setProgress] = useState(0);
 
@@ -40,10 +41,8 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
     return () => clearInterval(interval);
   }, [pump.status, currentOrder]);
 
-  const cardVariant = pump.status === 'available' && hasEnoughFuel ? 'active' : 'danger';
-
   return (
-    <Card variant={cardVariant}>
+    <Card variant={pump.status === 'available' && hasEnoughFuel ? 'active' : 'danger'}>
       <div className={styles.header}>
         <Fuel size={20} className={styles.iconMain} />
         <h3 className={styles.title}>Колонка №{pump.number}</h3>
@@ -52,9 +51,10 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
         <div className={styles.statusRow}>
           {pump.status === 'filling' ? <Zap size={14} className={styles.animatePulse} /> : <CheckCircle2 size={14} />}
           <span className={styles[pump.status]}>
-            {pump.status === 'available' ? (hasEnoughFuel ? 'Готова к работе' : 'Нет топлива') : 'Идет заправка'}
+            {pump.status === 'available' ? (hasEnoughFuel ? 'Готова' : 'Пуста') : 'Заправка'}
           </span>
         </div>
+
         {pump.status === 'filling' && currentOrder && (
           <div className={styles.progressSection}>
             <div className={styles.progressHeader}>
@@ -62,17 +62,36 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
                <span>{((currentOrder.requestedLiters * progress) / 100).toFixed(2)} / {currentOrder.requestedLiters} л</span>
             </div>
             <ProgressBar progress={progress} />
-            <div className={styles.moneyCounter}>{((currentOrder.totalPrice * progress) / 100).toFixed(2)} ₽</div>
           </div>
         )}
+
         <div className={styles.fuels}>
           {pump.availableFuels.map(fuelId => (
             <span key={fuelId} className={styles.fuelBadge}>{fuelId.replace('ai-', '')}</span>
           ))}
         </div>
-        <button className={styles.button} onClick={() => onSelect?.(pump)} disabled={pump.status !== 'available' || !hasEnoughFuel}>
-          {pump.status === 'filling' ? 'Занято' : !hasEnoughFuel ? 'Пусто' : 'Выбрать'}
-        </button>
+
+        {/* ЛОГИКА КНОПОК */}
+        {pump.status === 'filling' ? (
+          <button 
+            className={styles.stopButton} 
+            onClick={(e) => {
+              e.stopPropagation(); 
+              stopOrder(pump.id);
+            }}
+          >
+            <Square size={14} fill="currentColor" />
+            ОСТАНОВИТЬ
+          </button>
+        ) : (
+          <button 
+            className={styles.button} 
+            onClick={() => onSelect?.(pump)} 
+            disabled={!hasEnoughFuel}
+          >
+            {hasEnoughFuel ? 'Выбрать' : 'Нет топлива'}
+          </button>
+        )}
       </div>
     </Card>
   );
