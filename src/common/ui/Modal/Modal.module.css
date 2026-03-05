@@ -1,21 +1,32 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  z-index: 1000;
+  background: rgba(0, 0, 0, 0.85); /* Глубокий темный фон */
+  backdrop-filter: blur(8px); /* Сильное размытие для фокуса */
+  z-index: 9998;
 }
 
 .content {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  background: #1e1e1e;
+  /* transform задается через framer-motion для плавности */
+  background: #1a1a1a;
   border: 1px solid #333;
-  border-radius: 16px;
-  padding: 32px;
-  z-index: 1001;
-  min-width: 320px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  border-radius: 24px;
+  padding: 40px;
+  z-index: 9999;
+  min-width: 400px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  color: #fff;
+}
+
+/* Добавим стили для кнопок внутри модалки, чтобы они тоже были "дорогими" */
+.content button {
+  transition: all 0.2s ease;
+}
+
+.content button:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
 }
