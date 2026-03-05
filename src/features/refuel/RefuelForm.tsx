@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useFuelStore } from '@/app/providers/store';
 import type { FuelId } from '@/entities/fuel/model/types';
-import { Zap, Droplets, Banknote } from 'lucide-react'; // Добавили иконки
+import { Zap, Droplets, Banknote } from 'lucide-react';
 import styles from './RefuelForm.module.css';
 
 interface RefuelFormProps {
@@ -11,15 +11,16 @@ interface RefuelFormProps {
 }
 
 export const RefuelForm = ({ pumpId, availableFuels, onSuccess }: RefuelFormProps) => {
+  // Устанавливаем 0 по умолчанию
+  const [liters, setLiters] = useState(0);
   const [fuelId, setFuelId] = useState<FuelId>(availableFuels[0] as FuelId);
-  const [liters, setLiters] = useState(10);
   
   const createOrder = useFuelStore((state) => state.createOrder);
   const fuels = useFuelStore((state) => state.fuels);
   
   const currentFuel = fuels[fuelId];
-  const totalPrice = currentFuel.price * liters;
-  const canRefuel = currentFuel.remains >= liters;
+  const totalPrice = currentFuel.price * (liters || 0);
+  const canRefuel = currentFuel.remains >= liters && liters > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +38,7 @@ export const RefuelForm = ({ pumpId, availableFuels, onSuccess }: RefuelFormProp
       </div>
 
       <div className={styles.section}>
-        <label className={styles.label}>Выберите тип топлива</label>
+        <label className={styles.label}>Тип топлива</label>
         <div className={styles.fuelGrid}>
           {availableFuels.map((id) => (
             <button
@@ -54,35 +55,38 @@ export const RefuelForm = ({ pumpId, availableFuels, onSuccess }: RefuelFormProp
       </div>
 
       <div className={styles.section}>
-        <div className={styles.inputWrapper}>
-          <label className={styles.label}>Количество литров</label>
-          <div className={styles.inputGroup}>
-            <Droplets size={18} className={styles.inputIcon} />
-            <input
-              type="number"
-              min="1"
-              max={currentFuel.remains}
-              value={liters}
-              onChange={(e) => setLiters(Number(e.target.value))}
-              className={styles.input}
-            />
-          </div>
+        <label className={styles.label}>Объем топлива</label>
+        <div className={styles.inputContainer}>
+          <Droplets size={18} className={styles.inputIcon} />
+          <input
+            type="number"
+            min="0"
+            max={currentFuel.remains}
+            value={liters === 0 ? '' : liters} // Чтобы не мешался 0 при вводе
+            onChange={(e) => setLiters(Number(e.target.value))}
+            className={styles.inputField}
+            placeholder="0"
+          />
+          <span className={styles.inputUnit}>литров</span>
         </div>
 
         <div className={styles.summary}>
           <div className={styles.summaryItem}>
-            <Banknote size={16} />
-            <span>К оплате: <strong>{totalPrice.toFixed(2)} ₽</strong></span>
+            <Banknote size={20} className={styles.priceIcon} />
+            <div className={styles.priceContent}>
+              <span className={styles.priceLabel}>Итого к оплате</span>
+              <span className={styles.priceValue}>{totalPrice.toFixed(2)} ₽</span>
+            </div>
           </div>
-          <div className={`${styles.remains} ${!canRefuel ? styles.error : ''}`}>
-            Доступно: {currentFuel.remains.toFixed(2)} л
+          <div className={`${styles.remains} ${currentFuel.remains < liters ? styles.error : ''}`}>
+            На складе: {currentFuel.remains.toFixed(2)} л
           </div>
         </div>
       </div>
 
       <button 
         type="submit" 
-        disabled={!canRefuel || liters <= 0} 
+        disabled={!canRefuel} 
         className={styles.submitButton}
       >
         <Zap size={18} fill="currentColor" />
