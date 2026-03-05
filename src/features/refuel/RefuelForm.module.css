@@ -180,3 +180,37 @@
   color: #e74c3c;
   font-weight: bold;
 }
+
+
+.fuelOption {
+  display: flex;
+  flex-direction: column; /* Ставим название и цену друг под другом */
+  align-items: center;    /* Центрируем по горизонтали */
+  justify-content: center; /* Центрируем по вертикали */
+  gap: 4px;               /* Расстояние между названием и ценой */
+  padding: 12px 8px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fuelName {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.fuelPrice {
+  font-size: 0.75rem;
+  color: #27ae60; /* Цена будет зеленой под названием */
+  font-weight: 500;
+}
+
+.active {
+  background: rgba(39, 174, 96, 0.1);
+  border-color: #27ae60;
+  box-shadow: 0 0 10px rgba(39, 174, 96, 0.1);
+}

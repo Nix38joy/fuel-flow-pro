@@ -41,15 +41,16 @@ export const RefuelForm = ({ pumpId, availableFuels, onSuccess }: RefuelFormProp
         <label className={styles.label}>Тип топлива</label>
         <div className={styles.fuelGrid}>
           {availableFuels.map((id) => (
-            <button
-              key={id}
-              type="button"
-              className={`${styles.fuelOption} ${fuelId === id ? styles.active : ''}`}
-              onClick={() => setFuelId(id as FuelId)}
-            >
-              <span className={styles.fuelName}>{fuels[id as FuelId].name}</span>
-              <span className={styles.fuelPrice}>{fuels[id as FuelId].price} ₽</span>
-            </button>
+           <button
+  key={id}
+  type="button"
+  className={`${styles.fuelOption} ${fuelId === id ? styles.active : ''}`}
+  onClick={() => setFuelId(id as FuelId)}
+>
+  <span className={styles.fuelName}>{fuels[id as FuelId].name}</span>
+  <span className={styles.fuelPrice}>{fuels[id as FuelId].price} ₽</span>
+</button>
+
           ))}
         </div>
       </div>
