@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useFuelStore } from '@/app/providers/store';
+import { selectCreateOrder, selectFuels } from '@/app/providers/selectors';
 import type { FuelId } from '@/entities/fuel/model/types';
 import { Zap, Droplets, Banknote } from 'lucide-react';
 import { EmptyState } from '@/common/ui/EmptyState/EmptyState';
@@ -16,8 +17,8 @@ export const RefuelForm = ({ pumpId, availableFuels, onSuccess }: RefuelFormProp
   const [liters, setLiters] = useState(0);
   const [fuelId, setFuelId] = useState<FuelId | null>((availableFuels[0] as FuelId) ?? null);
   
-  const createOrder = useFuelStore((state) => state.createOrder);
-  const fuels = useFuelStore((state) => state.fuels);
+  const createOrder = useFuelStore(selectCreateOrder);
+  const fuels = useFuelStore(selectFuels);
 
   if (!fuelId || !fuels[fuelId]) {
     return (

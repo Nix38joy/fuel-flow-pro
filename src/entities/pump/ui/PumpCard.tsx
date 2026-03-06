@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useFuelStore } from '@/app/providers/store';
+import { selectCompleteOrder, selectFuels, selectOrders, selectPauseOrder, selectResumeOrder } from '@/app/providers/selectors';
 import { Card } from '@/common/ui/Card/Card';
 import { ProgressBar } from '@/common/ui/ProgressBar/ProgressBar';
 import { Fuel, Gauge, Zap, CheckCircle2, Square, Play, Check } from 'lucide-react';
@@ -13,12 +14,14 @@ interface PumpCardProps {
 }
 
 export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
-  const orders = useFuelStore((state) => state.orders);
-  const fuels = useFuelStore((state) => state.fuels);
-  const { pauseOrder, resumeOrder, completeOrder } = useFuelStore();
+  const orders = useFuelStore(selectOrders);
+  const fuels = useFuelStore(selectFuels);
+  const pauseOrder = useFuelStore(selectPauseOrder);
+  const resumeOrder = useFuelStore(selectResumeOrder);
+  const completeOrder = useFuelStore(selectCompleteOrder);
   
   const currentOrder = orders.find(o => o.id === pump.currentOrderId);
-  const [progress, setProgress] = useState(0);
+  const [fillingProgress, setFillingProgress] = useState(0);
   const requestedLiters = currentOrder?.requestedLiters ?? 0;
 
   const hasEnoughFuel = pump.availableFuels.some(
@@ -32,7 +35,6 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
       const duration = currentOrder.duration; 
       const start = currentOrder.createdAt;
       if (duration <= 0) {
-        setProgress(0);
         return;
       }
 
@@ -40,7 +42,7 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
         const now = Date.now();
         const elapsed = now - start;
         const percent = Math.max(0, Math.min((elapsed / duration) * 100, 100));
-        setProgress(percent);
+        setFillingProgress(percent);
 
         // Автоматическое завершение при 100%
         if (percent >= 100) {
@@ -48,18 +50,25 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
           completeOrder(currentOrder.id);
         }
       }, 100);
-    } else if (currentOrder?.status === 'paused') {
-      // На паузе фиксируем прогресс на основе уже налитых литров
-      const percent = requestedLiters > 0
-        ? (currentOrder.filledLiters / requestedLiters) * 100
-        : 0;
-      setProgress(percent);
-    } else {
-      setProgress(0);
     }
 
     return () => clearInterval(interval);
-  }, [currentOrder?.status, currentOrder?.createdAt, currentOrder?.id]);
+  }, [
+    completeOrder,
+    currentOrder?.createdAt,
+    currentOrder?.duration,
+    currentOrder?.id,
+    currentOrder?.status,
+  ]);
+
+  const pausedProgress = currentOrder?.status === 'paused' && requestedLiters > 0
+    ? (currentOrder.filledLiters / requestedLiters) * 100
+    : 0;
+  const progress = currentOrder?.status === 'filling'
+    ? fillingProgress
+    : currentOrder?.status === 'paused'
+      ? pausedProgress
+      : 0;
 
   return (
     <Card variant={pump.status === 'available' && hasEnoughFuel ? 'active' : 'danger'}>

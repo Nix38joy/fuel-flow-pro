@@ -6,6 +6,7 @@ import { StockMonitor } from '@/widgets/stock-monitor/StockMonitor';
 import { RefuelForm } from '@/features/refuel/RefuelForm'; 
 import { EmptyState } from '@/common/ui/EmptyState/EmptyState'; 
 import type { Pump } from '@/entities/pump/model/types';
+import styles from './App.module.css';
 
 function App() {
   const [selectedPump, setSelectedPump] = useState<Pump | null>(null);
@@ -21,15 +22,7 @@ function App() {
   // ЗАГЛУШКА ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ
   if (isMobile) {
     return (
-      <div style={{ 
-        height: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        background: '#121212',
-        padding: '40px',
-        textAlign: 'center'
-      }}>
+      <div className={styles.mobileBlock}>
         <EmptyState 
           icon={MonitorOff} 
           title="Desktop Terminal Only" 
@@ -41,46 +34,23 @@ function App() {
 
   // ОСНОВНОЙ ИНТЕРФЕЙС ДЛЯ ДЕСКТОПА
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#121212', color: '#fff' }}>
-      <main style={{ 
-        flex: 1, 
-        padding: '40px', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        gap: '40px',
-        overflowX: 'hidden'
-      }}>
+    <div className={styles.page}>
+      <main className={styles.main}>
         <header>
-          <h1 style={{ fontSize: '2rem', margin: 0 }}>⛽ FuelFlow Pro</h1>
+          <h1 className={styles.title}>⛽ FuelFlow Pro</h1>
         </header>
         
         <StockMonitor />
         
-        <div style={{ 
-          display: 'flex', 
-          gap: '40px', 
-          flex: 1,
-          alignItems: 'flex-start'
-        }}>
-          <div style={{ width: '350px', flexShrink: 0 }}>
+        <div className={styles.contentLayout}>
+          <div className={styles.pumpColumn}>
             <PumpList onSelect={setSelectedPump} />
           </div>
 
-          <div style={{ 
-            flex: '0 1 600px',
-            background: '#1a1a1a', 
-            borderRadius: '16px', 
-            border: '1px solid #333', 
-            display: 'grid',
-            placeItems: 'center',
-            minHeight: '500px',
-            padding: '40px',
-            position: 'relative',
-            overflow: 'hidden'
-           }}>
+          <div className={styles.refuelPanel}>
 
             {selectedPump ? (
-              <div style={{ width: '100%'}}>
+              <div className={styles.refuelFormWrapper}>
               <RefuelForm 
                 pumpId={selectedPump.id} 
                 availableFuels={selectedPump.availableFuels} 

@@ -18,8 +18,4 @@ export interface Pump extends BaseEntity {
   
   /** ID текущего заказа, если колонка в статусе 'filling' */
   currentOrderId?: string;
-}export interface Order {
-  id: string;
-  // ... твои поля
-  duration: number; // ОБЯЗАТЕЛЬНО ДОБАВЬ ЭТО
 }

@@ -1,10 +1,11 @@
 import { useFuelStore } from '@/app/providers/store';
+import { selectFuels } from '@/app/providers/selectors';
 import { ProgressBar } from '@/common/ui/ProgressBar/ProgressBar';
 import { Database } from 'lucide-react';
 import styles from './StockMonitor.module.css';
 
 export const StockMonitor = () => {
-  const fuels = useFuelStore((state) => state.fuels);
+  const fuels = useFuelStore(selectFuels);
 
   return (
     <section className={styles.container}>

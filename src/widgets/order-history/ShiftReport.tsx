@@ -1,30 +1,42 @@
 import { Modal } from '@/common/ui/Modal/Modal';
-import styles from './OrderHistory.module.css'; // Используем те же стили или создай новые
+import styles from './ShiftReport.module.css';
 
 interface ShiftReportProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: () => unknown;
   revenue: number;
   liters: number;
+  hasActiveOrders: boolean;
 }
 
-export const ShiftReport = ({ isOpen, onClose, onConfirm, revenue, liters }: ShiftReportProps) => (
+export const ShiftReport = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  revenue,
+  liters,
+  hasActiveOrders,
+}: ShiftReportProps) => (
   <Modal isOpen={isOpen} onClose={onClose}>
-    <div style={{ textAlign: 'center' }}>
-      <h2 style={{ color: '#fff', marginBottom: '24px' }}>Отчет за смену</h2>
+    <div className={styles.root}>
+      <h2 className={styles.title}>Отчет за смену</h2>
       
-      <div style={{ background: '#252525', padding: '20px', borderRadius: '12px', marginBottom: '24px' }}>
-         <p style={{ color: '#888', marginBottom: '5px' }}>Итого выручка:</p>
-         <h3 style={{ color: '#27ae60', fontSize: '1.8rem', margin: 0 }}>{revenue.toFixed(2)} ₽</h3>
+      <div className={styles.stats}>
+         <p className={styles.label}>Итого выручка:</p>
+         <h3 className={styles.revenue}>{revenue.toFixed(2)} ₽</h3>
          
-         <p style={{ color: '#888', marginTop: '15px', marginBottom: '5px' }}>Пролито топлива:</p>
-         <h3 style={{ color: '#fff', fontSize: '1.2rem', margin: 0 }}>{liters.toFixed(2)} л</h3>
+         <p className={styles.labelSecondary}>Пролито топлива:</p>
+         <h3 className={styles.liters}>{liters.toFixed(2)} л</h3>
       </div>
 
-      <div style={{ display: 'flex', gap: '12px' }}>
+      {hasActiveOrders && <p className={styles.warning}>Есть активные заправки. Закрытие смены недоступно.</p>}
+
+      <div className={styles.actions}>
         <button onClick={onClose} className={styles.cancelBtn}>Отмена</button>
-        <button onClick={onConfirm} className={styles.confirmBtn}>Закрыть смену</button>
+        <button onClick={onConfirm} className={styles.confirmBtn} disabled={hasActiveOrders}>
+          Закрыть смену
+        </button>
       </div>
     </div>
   </Modal>
