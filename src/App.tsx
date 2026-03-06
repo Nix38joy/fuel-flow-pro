@@ -71,27 +71,30 @@ function App() {
             background: '#1a1a1a', 
             borderRadius: '16px', 
             border: '1px solid #333', 
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: 'grid',
+            placeItems: 'center',
             minHeight: '500px',
-            padding: '20px'
-          }}>
+            padding: '40px',
+            position: 'relative',
+            overflow: 'hidden'
+           }}>
+
             {selectedPump ? (
+              <div style={{ width: '100%'}}>
               <RefuelForm 
                 pumpId={selectedPump.id} 
                 availableFuels={selectedPump.availableFuels} 
                 onSuccess={() => setSelectedPump(null)} 
               />
+              </div>
             ) : (
-              <div style={{ width: '100%', textAlign: 'center' }}>
-                <EmptyState 
+            
+              <EmptyState 
                   icon={Fuel} 
                   title="Колонка не выбрана" 
                   description="Выберите свободную заправочную колонку на карте слева, чтобы настроить параметры подачи топлива" 
                 />
-              </div>
+              
             )}
           </div>
         </div>
