@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useFuelStore } from '@/app/providers/store';
 import type { FuelId } from '@/entities/fuel/model/types';
 import { Zap, Droplets, Banknote } from 'lucide-react';
+import { EmptyState } from '@/common/ui/EmptyState/EmptyState';
 import styles from './RefuelForm.module.css';
 
 interface RefuelFormProps {
@@ -13,19 +14,29 @@ interface RefuelFormProps {
 export const RefuelForm = ({ pumpId, availableFuels, onSuccess }: RefuelFormProps) => {
   // Устанавливаем 0 по умолчанию
   const [liters, setLiters] = useState(0);
-  const [fuelId, setFuelId] = useState<FuelId>(availableFuels[0] as FuelId);
+  const [fuelId, setFuelId] = useState<FuelId | null>((availableFuels[0] as FuelId) ?? null);
   
   const createOrder = useFuelStore((state) => state.createOrder);
   const fuels = useFuelStore((state) => state.fuels);
-  
+
+  if (!fuelId || !fuels[fuelId]) {
+    return (
+      <EmptyState
+        icon={Droplets}
+        title="Нет доступного топлива"
+        description="Для этой колонки сейчас не найден доступный тип топлива."
+      />
+    );
+  }
+
   const currentFuel = fuels[fuelId];
   const totalPrice = currentFuel.price * (liters || 0);
-  const canRefuel = currentFuel.remains >= liters && liters > 0;
+  const canRefuel = Number.isFinite(liters) && currentFuel.remains >= liters && liters > 0;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (canRefuel) {
-      createOrder(pumpId, fuelId, liters);
+      createOrder(pumpId, fuelId, Number(liters.toFixed(2)));
       onSuccess();
     }
   };
@@ -64,7 +75,10 @@ export const RefuelForm = ({ pumpId, availableFuels, onSuccess }: RefuelFormProp
             min="0"
             max={currentFuel.remains}
             value={liters === 0 ? '' : liters} // Чтобы не мешался 0 при вводе
-            onChange={(e) => setLiters(Number(e.target.value))}
+            onChange={(e) => {
+              const parsed = Number(e.target.value);
+              setLiters(Number.isFinite(parsed) ? parsed : 0);
+            }}
             className={styles.inputField}
             placeholder="0"
           />

@@ -19,6 +19,7 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
   
   const currentOrder = orders.find(o => o.id === pump.currentOrderId);
   const [progress, setProgress] = useState(0);
+  const requestedLiters = currentOrder?.requestedLiters ?? 0;
 
   const hasEnoughFuel = pump.availableFuels.some(
     (fuelId) => fuels[fuelId as FuelId].remains > 50
@@ -30,11 +31,15 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
     if (currentOrder?.status === 'filling') {
       const duration = currentOrder.duration; 
       const start = currentOrder.createdAt;
+      if (duration <= 0) {
+        setProgress(0);
+        return;
+      }
 
       interval = setInterval(() => {
         const now = Date.now();
         const elapsed = now - start;
-        const percent = Math.min((elapsed / duration) * 100, 100);
+        const percent = Math.max(0, Math.min((elapsed / duration) * 100, 100));
         setProgress(percent);
 
         // Автоматическое завершение при 100%
@@ -45,7 +50,9 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
       }, 100);
     } else if (currentOrder?.status === 'paused') {
       // На паузе фиксируем прогресс на основе уже налитых литров
-      const percent = (currentOrder.filledLiters / currentOrder.requestedLiters) * 100;
+      const percent = requestedLiters > 0
+        ? (currentOrder.filledLiters / requestedLiters) * 100
+        : 0;
       setProgress(percent);
     } else {
       setProgress(0);
@@ -79,7 +86,7 @@ export const PumpCard = ({ pump, onSelect }: PumpCardProps) => {
             <div className={styles.progressHeader}>
                <Gauge size={14} />
                <span>
-                 {((currentOrder?.requestedLiters || 0) * progress / 100).toFixed(2)} / {currentOrder?.requestedLiters} л
+                 {(requestedLiters * progress / 100).toFixed(2)} / {requestedLiters} л
                </span>
             </div>
             <ProgressBar progress={progress} />
