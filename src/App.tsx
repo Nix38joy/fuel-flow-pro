@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Fuel } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Fuel, MonitorOff } from 'lucide-react';
 import { PumpList } from '@/widgets/pump-list/PumpList';
 import { OrderHistory } from '@/widgets/order-history/OrderHistory';
 import { StockMonitor } from '@/widgets/stock-monitor/StockMonitor';
@@ -9,7 +9,37 @@ import type { Pump } from '@/entities/pump/model/types';
 
 function App() {
   const [selectedPump, setSelectedPump] = useState<Pump | null>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
+  // Следим за изменением размера экрана, чтобы интерфейс не ломался при ресайзе
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // ЗАГЛУШКА ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ
+  if (isMobile) {
+    return (
+      <div style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        background: '#121212',
+        padding: '40px',
+        textAlign: 'center'
+      }}>
+        <EmptyState 
+          icon={MonitorOff} 
+          title="Desktop Terminal Only" 
+          description="Система FuelFlow Pro оптимизирована для работы на широкоформатных стационарных терминалах (от 1024px). Пожалуйста, используйте ПК для управления АЗС." 
+        />
+      </div>
+    );
+  }
+
+  // ОСНОВНОЙ ИНТЕРФЕЙС ДЛЯ ДЕСКТОПА
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#121212', color: '#fff' }}>
       <main style={{ 
@@ -18,7 +48,7 @@ function App() {
         display: 'flex', 
         flexDirection: 'column', 
         gap: '40px',
-        overflowX: 'hidden' // Защита от горизонтального скролла
+        overflowX: 'hidden'
       }}>
         <header>
           <h1 style={{ fontSize: '2rem', margin: 0 }}>⛽ FuelFlow Pro</h1>
@@ -26,29 +56,26 @@ function App() {
         
         <StockMonitor />
         
-        {/* ГЛАВНАЯ РАБОЧАЯ ОБЛАСТЬ */}
         <div style={{ 
           display: 'flex', 
           gap: '40px', 
           flex: 1,
-          alignItems: 'flex-start' // Чтобы блоки не растягивались по высоте принудительно
+          alignItems: 'flex-start'
         }}>
-          {/* СЛЕВА: СПИСОК КОЛОНОК (Фиксированная ширина) */}
           <div style={{ width: '350px', flexShrink: 0 }}>
             <PumpList onSelect={setSelectedPump} />
           </div>
 
-          {/* В ЦЕНТРЕ: ПАНЕЛЬ УПРАВЛЕНИЯ (Ограниченная ширина + центрирование) */}
           <div style={{ 
-            flex: '0 1 600px', // Ширина 600px, не растягивается больше
+            flex: '0 1 600px',
             background: '#1a1a1a', 
             borderRadius: '16px', 
             border: '1px solid #333', 
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center', // Центрирует контент по горизонтали
-            justifyContent: 'center', // Центрирует контент по вертикали
-            minHeight: '500px', // Минимальная высота, чтобы окно было солидным
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '500px',
             padding: '20px'
           }}>
             {selectedPump ? (
@@ -70,7 +97,6 @@ function App() {
         </div>
       </main>
       
-      {/* СПРАВА: ИСТОРИЯ ОПЕРАЦИЙ */}
       <OrderHistory />
     </div>
   );
